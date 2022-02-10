@@ -1,0 +1,3 @@
+﻿The Arial font was developed by Microsoft and is apart of the Core fonts for the Web.
+
+all art assests were created by Alex Moffet
