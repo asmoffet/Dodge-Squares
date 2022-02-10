@@ -10,12 +10,14 @@ namespace GameProject1
         private SpriteBatch _spriteBatch;
 
         private Player player;
-        private PainSquare[] painSquare;
+        private PainSquare[] painSquares;
+        private LongBoi longBoi;
         private SpriteFont arial;
 
         private bool gameStarted = false;
-        private int square = 0;
-        private int nxtsqr = 10;
+        private int square = 0;        
+        private double nxtsqr = 10;
+        private double nxtBoi = 30;
         private int hghscr = 0;
 
         public Game1()
@@ -29,7 +31,7 @@ namespace GameProject1
         {
             // TODO: Add your initialization logic here
             player = new Player();
-            painSquare = new PainSquare[] 
+            painSquares = new PainSquare[] 
             {
                 new PainSquare(new Vector2(500, 200), player),
                 new PainSquare(new Vector2(500, 500), player),
@@ -43,6 +45,8 @@ namespace GameProject1
                 new PainSquare(new Vector2(500, 500), player),
                 new PainSquare(new Vector2(500, 500), player) 
             };
+            longBoi = new LongBoi(player);
+
             base.Initialize();
         }
 
@@ -51,7 +55,8 @@ namespace GameProject1
             _spriteBatch = new SpriteBatch(GraphicsDevice);
 
             // TODO: use this.Content to load your game content here
-            foreach (var pain in painSquare) pain.LoadContent(Content);
+            foreach (var pain in painSquares) pain.LoadContent(Content);
+            longBoi.LoadContent(Content);
             player.LoadContent(Content);
             arial = Content.Load<SpriteFont>("arial");
         }
@@ -65,7 +70,7 @@ namespace GameProject1
             if (Keyboard.GetState().IsKeyDown(Keys.Space) && !gameStarted)
             {
                 gameStarted = true;
-                painSquare[square].active = true;
+                painSquares[square].active = true;
                 square++;
             }
 
@@ -74,36 +79,68 @@ namespace GameProject1
             Viewport viewport = _graphics.GraphicsDevice.Viewport;
             player.Update(gameTime, viewport);
             
-            if(player.score > nxtsqr && square < painSquare.Length)
+            if(player.score > nxtsqr && square < painSquares.Length)
             {
-                painSquare[square].active = true;
-                nxtsqr += 10 * square;
+                painSquares[square].active = true;
+                nxtsqr += 20;
                 square++;
             }
 
-            foreach (var pain in painSquare)
+            if(player.score > nxtBoi )
+            {
+                longBoi.active = true;
+            }
+
+            foreach (var pain in painSquares)
             {
                 
                 pain.Update(gameTime, viewport);
-
+                
                 if (pain.active && pain.HB.CollidesWith(player.HB))
                 {
                     if (player.score > hghscr)
                     {
                         hghscr = player.score;
                     }
-                    foreach (var p in painSquare)
+                    foreach (var p in painSquares)
                     {
                         p.active = false;
                         p.resetPain(viewport);
                     }
+                    longBoi.active = false;
+                    longBoi.resetLong(viewport);
                     gameStarted = false;
                     player.playerReset();
                     player.score = 0;
                     nxtsqr = 10;
                     square = 0;
                 }
+                
             }
+
+                longBoi.Update(gameTime, viewport);
+                
+                if(longBoi.active && longBoi.HB.CollidesWith(player.HB))
+                {
+                    if (player.score > hghscr)
+                    {
+                        hghscr = player.score;
+                    }
+                    foreach (var p in painSquares)
+                    {
+                        p.active = false;
+                        p.resetPain(viewport);
+                    }
+                    longBoi.active = false;
+                    longBoi.resetLong(viewport);
+                    gameStarted = false;
+                    player.playerReset();
+                    player.score = 0;
+                    nxtsqr = 10;
+                    square = 0;
+                }
+                
+            
 
             base.Update(gameTime);
         }
@@ -122,7 +159,8 @@ namespace GameProject1
             _spriteBatch.DrawString(arial, player.score.ToString(), new Vector2(viewport.Width / 2, viewport.Height / 2), Color.White, 0, new Vector2(25,25), 1f, SpriteEffects.None, 0);
             _spriteBatch.DrawString(arial, "HIGH SCORE: " + hghscr.ToString(), new Vector2(5,5), Color.White, 0, Vector2.Zero, .3f, SpriteEffects.None, 0);
             player.Draw(gameTime, _spriteBatch);
-            foreach (var pain in painSquare) pain.Draw(gameTime, _spriteBatch);
+            foreach (var pain in painSquares) pain.Draw(gameTime, _spriteBatch);
+            longBoi.Draw(gameTime, _spriteBatch);
             _spriteBatch.End();
             base.Draw(gameTime);
         }
