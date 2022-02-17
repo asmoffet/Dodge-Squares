@@ -23,6 +23,8 @@ namespace GameProject1
 
         private bool blink = true;
 
+        private bool helper = false;
+
         private int timer = 0;
 
         private Color color = Color.White;
@@ -43,6 +45,7 @@ namespace GameProject1
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A)) { position += new Vector2(-5, 0); }
             if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D)) { position += new Vector2(5, 0); }
             if (keyboardState.IsKeyDown(Keys.Space)) { Blink(); }
+            if (keyboardState.IsKeyDown(Keys.H)) { helper = true; }
             CheckBounds(viewport);
             hb.X = position.X;
             hb.Y = position.Y;
@@ -63,12 +66,16 @@ namespace GameProject1
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
         {
             spriteBatch.Draw(texture, position, null, color);
+            if(color == Color.White && helper)
+            {
+                spriteBatch.Draw(texture, position + new Vector2(150 + 16, 16), null, Color.White, 0f, Vector2.Zero,.2f, SpriteEffects.None, 0);
+            }
             //spriteBatch.Draw(texture, new Vector2(hb.X, hb.Y), null, Color.Gold);
         }
 
         private void Blink()
         {
-            if (blink) position += new Vector2(125, 0);
+            if (blink) position += new Vector2(150, 0);
             blink = false;
             color = Color.Red;
             timer = 30;
@@ -98,6 +105,7 @@ namespace GameProject1
         public void playerReset()
         {
             position = new Vector2(200, 200);
+            helper = false;
         }
     }
 }

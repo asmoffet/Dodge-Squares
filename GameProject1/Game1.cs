@@ -220,6 +220,7 @@ namespace GameProject1
             if (!gameStarted)
             {
                 _spriteBatch.DrawString(arial, "Press Space to start/dash.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 45), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(arial, "Press H for a dash marker.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 60), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);
             }
             _spriteBatch.DrawString(arial, player.score.ToString(), new Vector2(viewport.Width / 2, viewport.Height / 2), Color.White, 0, new Vector2(25,25), 1f, SpriteEffects.None, 0);
             _spriteBatch.DrawString(arial, "HIGH SCORE: " + hghscr.ToString(), new Vector2(5,5), Color.White, 0, Vector2.Zero, .3f, SpriteEffects.None, 0);
