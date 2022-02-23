@@ -20,6 +20,12 @@
 /processorParam:TextureFormat=Compressed
 /build:arial.spritefont
 
+#begin bgmusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:bgmusic.mp3
+
 #begin LongBoi.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -31,6 +37,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:LongBoi.png
+
+#begin Pickup_Coin.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Pickup_Coin.wav
+
+#begin Randomize6.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Randomize6.wav
 
 #begin squareMan.png
 /importer:TextureImporter

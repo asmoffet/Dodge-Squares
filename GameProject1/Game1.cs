@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System.Threading;
 
 namespace GameProject1
@@ -9,14 +10,19 @@ namespace GameProject1
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+        private KeyboardState currentKeyboadState;
+        private KeyboardState priorKeyboadState;
 
         private Player player;
         private PainSquare[] painSquares;
         private LongBoi longBoi;
         private DeathLazer[] dl;
+        private GoalSquare[] gs;
         private SpriteFont arial;
+        private Song backgroundMusic;
 
         private bool gameStarted = false;
+        private bool goalMode = false;
         private int square = 0;        
         private double nxtsqr = 10;
         private double nxtBoi = 30;
@@ -57,6 +63,9 @@ namespace GameProject1
                 new DeathLazer(player),
                 new DeathLazer(player)
             };
+
+            gs = new GoalSquare[] { new GoalSquare(new Vector2(500, 500), player) };
+
             base.Initialize();
         }
 
@@ -68,24 +77,40 @@ namespace GameProject1
             foreach (var pain in painSquares) pain.LoadContent(Content);
             longBoi.LoadContent(Content);
             foreach(var death in dl) death.LoadContent(Content);
+            foreach (var goal in gs) goal.LoadContent(Content);
             player.LoadContent(Content);
             arial = Content.Load<SpriteFont>("arial");
+            backgroundMusic = Content.Load<Song>("bgmusic");
+            MediaPlayer.IsRepeating = true;
+            MediaPlayer.Play(backgroundMusic);
         }
 
         protected override void Update(GameTime gameTime)
         {
+
+            Viewport viewport = _graphics.GraphicsDevice.Viewport;
+            priorKeyboadState = currentKeyboadState;
+            currentKeyboadState = Keyboard.GetState();
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
+            if (Keyboard.GetState().IsKeyDown(Keys.G) && !gameStarted && priorKeyboadState != currentKeyboadState)
+            {
+                goalMode = !goalMode;
+            }
+
             // TODO: Add your update logic here
-            if (Keyboard.GetState().IsKeyDown(Keys.Space) && !gameStarted)
+            if (Keyboard.GetState().IsKeyDown(Keys.Space) && !gameStarted && priorKeyboadState != currentKeyboadState)
             {
                 gameStarted = true;
                 painSquares[square].active = true;
                 square++;
+                if (goalMode)
+                {
+                    gs[0].goalStart(viewport);
+                }
             }
 
-            Viewport viewport = _graphics.GraphicsDevice.Viewport;
             player.Update(gameTime, viewport);
             
             if(player.score > nxtsqr && square < painSquares.Length)
@@ -110,7 +135,7 @@ namespace GameProject1
             foreach (var pain in painSquares)
             {
                 
-                pain.Update(gameTime, viewport);
+                pain.Update(gameTime, viewport, goalMode);
                 
                 if (pain.active && pain.HB.CollidesWith(player.HB))
                 {
@@ -121,15 +146,16 @@ namespace GameProject1
                     foreach (var p in painSquares)
                     {
                         p.active = false;
-                        p.resetPain(viewport);
+                        p.resetPain(viewport, goalMode);
                     }
                     foreach(var death in dl)
                     {
                         death.active = false;
                         death.laserCoolDown();
                     }
+                    foreach (var goal in gs) goal.exitScreen();
                     longBoi.active = false;
-                    longBoi.resetLong(viewport);
+                    longBoi.resetLong(viewport, goalMode);
                     gameStarted = false;
                     player.playerReset();
                     player.score = 0;
@@ -142,7 +168,7 @@ namespace GameProject1
             }
 
 
-            longBoi.Update(gameTime, viewport);
+            longBoi.Update(gameTime, viewport, goalMode);
 
             if (longBoi.active && longBoi.HB.CollidesWith(player.HB))
             {
@@ -153,15 +179,16 @@ namespace GameProject1
                 foreach (var p in painSquares)
                 {
                     p.active = false;
-                    p.resetPain(viewport);
+                    p.resetPain(viewport, goalMode);
                 }
                 foreach (var death in dl)
                 {
                     death.active = false;
                     death.laserCoolDown();
                 }
+                foreach (var goal in gs) goal.exitScreen();
                 longBoi.active = false;
-                longBoi.resetLong(viewport);
+                longBoi.resetLong(viewport, goalMode);
                 gameStarted = false;
                 player.playerReset();
                 player.score = 0;
@@ -175,7 +202,7 @@ namespace GameProject1
 
             foreach (var death in dl)
             {
-                death.Update(gameTime, viewport);
+                death.Update(gameTime, viewport, goalMode);
                 if (death.active && death.HB.CollidesWith(player.HB))
                 {
 
@@ -187,15 +214,16 @@ namespace GameProject1
                     foreach (var p in painSquares)
                     {
                         p.active = false;
-                        p.resetPain(viewport);
+                        p.resetPain(viewport, goalMode);
                     }
                     foreach (var death2 in dl)
                     {
                         death2.active = false;
                         death2.laserCoolDown();
                     }
+                    foreach (var goal in gs) goal.exitScreen();
                     longBoi.active = false;
-                    longBoi.resetLong(viewport);
+                    longBoi.resetLong(viewport, goalMode);
                     gameStarted = false;
                     player.playerReset();
                     player.score = 0;
@@ -206,6 +234,14 @@ namespace GameProject1
                 }
             }
             
+            foreach(var goal in gs)
+            {
+                if (goal.HB.CollidesWith(player.HB))
+                {
+                    goal.resetGoal(viewport);
+                }
+            }
+
 
             base.Update(gameTime);
         }
@@ -220,14 +256,18 @@ namespace GameProject1
             if (!gameStarted)
             {
                 _spriteBatch.DrawString(arial, "Press Space to start/dash.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 45), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);
-                _spriteBatch.DrawString(arial, "Press H for a dash marker.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 60), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(arial, "Press H for a dash marker.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 65), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);
+                _spriteBatch.DrawString(arial, "Press G to play goal mode!.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 85), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);
             }
             _spriteBatch.DrawString(arial, player.score.ToString(), new Vector2(viewport.Width / 2, viewport.Height / 2), Color.White, 0, new Vector2(25,25), 1f, SpriteEffects.None, 0);
             _spriteBatch.DrawString(arial, "HIGH SCORE: " + hghscr.ToString(), new Vector2(5,5), Color.White, 0, Vector2.Zero, .3f, SpriteEffects.None, 0);
+            if(goalMode) _spriteBatch.DrawString(arial, "Mode == Goal", new Vector2(viewport.Width - 150, 5), Color.White, 0, Vector2.Zero, .3f, SpriteEffects.None, 0);
+            else _spriteBatch.DrawString(arial, "Mode == Dodge", new Vector2(viewport.Width - 150, 5), Color.White, 0, Vector2.Zero, .3f, SpriteEffects.None, 0);
             player.Draw(gameTime, _spriteBatch);
             longBoi.Draw(gameTime, _spriteBatch);
             foreach (var pain in painSquares) pain.Draw(gameTime, _spriteBatch);
             foreach(var death in dl)death.Draw(gameTime, _spriteBatch);
+            foreach (var goal in gs) goal.Draw(gameTime, _spriteBatch);
             _spriteBatch.End();
             base.Draw(gameTime);
         }

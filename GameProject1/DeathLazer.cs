@@ -46,7 +46,7 @@ namespace GameProject1
             texture2 = content.Load<Texture2D>("LongBoi");
         }
 
-        public void Update(GameTime gameTime, Viewport viewport)
+        public void Update(GameTime gameTime, Viewport viewport, bool mode)
         {
             if (active && phase == 0)
             {
@@ -92,7 +92,7 @@ namespace GameProject1
                 if(timer == 0)
                 {
                     timer = 76;
-                    p.score++;
+                    if(!mode)p.score++;
                     phase++;
                 }
                 timer--;

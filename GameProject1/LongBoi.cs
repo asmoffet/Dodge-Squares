@@ -39,7 +39,7 @@ namespace GameProject1
             texture = content.Load<Texture2D>("LongBoi");
         }
 
-        public void Update(GameTime gameTime, Viewport viewport)
+        public void Update(GameTime gameTime, Viewport viewport, bool mode)
         {
             if (active)
             {
@@ -49,17 +49,17 @@ namespace GameProject1
 
             if (position.X <= 0)
             {
-                resetLong(viewport);
+                resetLong(viewport, mode);
             }
         }
 
-        public void resetLong(Viewport viewport)
+        public void resetLong(Viewport viewport, bool mode)
         {
             Vector2 rsPos = new Vector2(viewport.Width + rand.Next(100, 201), 0);
             position = rsPos;
             hb.X = rsPos.X;
             hb.Y = rsPos.Y;
-            p.score++;
+            if(!mode)p.score++;
         }
 
         public void Draw(GameTime gameTime, SpriteBatch spriteBatch)

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Audio;
 using GameProject1.Collisions;
 
 namespace GameProject1
@@ -14,6 +15,8 @@ namespace GameProject1
         private KeyboardState keyboardState;
 
         private Texture2D texture;
+
+        private SoundEffect sfx;
 
         private Vector2 position = new Vector2(200, 200);
 
@@ -35,6 +38,7 @@ namespace GameProject1
         public void LoadContent(ContentManager content)
         {
             texture = content.Load<Texture2D>("squareMan");
+            sfx = content.Load<SoundEffect>("Randomize6");
         }
 
         public void Update(GameTime gameTime, Viewport viewport)
@@ -44,7 +48,7 @@ namespace GameProject1
             if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S)) { position += new Vector2(0, 5); }
             if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A)) { position += new Vector2(-5, 0); }
             if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D)) { position += new Vector2(5, 0); }
-            if (keyboardState.IsKeyDown(Keys.Space)) { Blink(); }
+            if (keyboardState.IsKeyDown(Keys.Space) && blink) { Blink(); }
             if (keyboardState.IsKeyDown(Keys.H)) { helper = true; }
             CheckBounds(viewport);
             hb.X = position.X;
@@ -75,10 +79,11 @@ namespace GameProject1
 
         private void Blink()
         {
-            if (blink) position += new Vector2(150, 0);
+            if (blink) { position += new Vector2(150, 0); sfx.Play(.25f,0f, 0f); }
             blink = false;
             color = Color.Red;
             timer = 30;
+            
         }
 
         private void CheckBounds(Viewport viewport)
