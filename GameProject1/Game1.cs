@@ -25,10 +25,13 @@ namespace GameProject1
         private bool goalMode = false;
         private int square = 0;        
         private double nxtsqr = 10;
-        private double nxtBoi = 30;
+        private double nxtBoi = 50;
         private int lzr = 0;
-        private double nxtLzr = 50;
+        private double nxtLzr = 30;
         private int hghscr = 0;
+        private float magnatude = 1f;
+        private bool dead = false;
+
 
         public Game1()
         {
@@ -66,6 +69,7 @@ namespace GameProject1
 
             gs = new GoalSquare[] { new GoalSquare(new Vector2(500, 500), player) };
 
+            Components.Add(player.Initialize(this));
             base.Initialize();
         }
 
@@ -157,11 +161,12 @@ namespace GameProject1
                     longBoi.active = false;
                     longBoi.resetLong(viewport, goalMode);
                     gameStarted = false;
+                    dead = true;
                     player.playerReset();
                     player.score = 0;
                     nxtsqr = 10;
                     square = 0;
-                    nxtLzr = 50;
+                    nxtLzr = 30;
                     lzr = 0;
                 }
                 
@@ -190,11 +195,12 @@ namespace GameProject1
                 longBoi.active = false;
                 longBoi.resetLong(viewport, goalMode);
                 gameStarted = false;
+                dead = true;
                 player.playerReset();
                 player.score = 0;
                 nxtsqr = 10;
                 square = 0;
-                nxtLzr = 50;
+                nxtLzr = 30;
                 lzr = 0;
             }
 
@@ -225,11 +231,12 @@ namespace GameProject1
                     longBoi.active = false;
                     longBoi.resetLong(viewport, goalMode);
                     gameStarted = false;
+                    dead = true;
                     player.playerReset();
                     player.score = 0;
                     nxtsqr = 10;
                     square = 0;
-                    nxtLzr = 50;
+                    nxtLzr = 30;
                     lzr = 0;
                 }
             }
@@ -248,11 +255,32 @@ namespace GameProject1
 
         protected override void Draw(GameTime gameTime)
         {
+
+
+
             GraphicsDevice.Clear(Color.Black);
 
             // TODO: Add your drawing code here
             Viewport viewport = _graphics.GraphicsDevice.Viewport;
-            _spriteBatch.Begin();
+
+            Matrix zoom = Matrix.CreateScale(magnatude);
+            if (dead)
+            {
+                magnatude = 2;
+                dead = false;
+            }
+            else if(magnatude > 1f)
+            {
+                magnatude -= .05f;
+                if (magnatude < 1f)
+                {
+                    magnatude = 1f;
+                }
+
+            }
+            
+
+            _spriteBatch.Begin(transformMatrix : zoom);
             if (!gameStarted)
             {
                 _spriteBatch.DrawString(arial, "Press Space to start/dash.", new Vector2((viewport.Width / 2) - 110, (viewport.Height / 2) - 45), Color.White, 0, Vector2.Zero, .25f, SpriteEffects.None, 0);

@@ -10,7 +10,7 @@ using GameProject1.Collisions;
 
 namespace GameProject1
 {
-    public class Player
+    public class Player: IParticleEmitter
     {
         private KeyboardState keyboardState;
 
@@ -18,9 +18,15 @@ namespace GameProject1
 
         private SoundEffect sfx;
 
-        private Vector2 position = new Vector2(200, 200);
+        public Vector2 position = new Vector2(200, 200);
 
         private RectangleCollision hb = new RectangleCollision(new Vector2(200, 200), 32, 32);
+
+        public Vector2 Position { get; set; }
+
+        public Vector2 Velocity { get; set; }
+
+        DashParticle dashParticle;
 
         public RectangleCollision HB => hb;
 
@@ -35,6 +41,12 @@ namespace GameProject1
         public int score = 0;
 
         public RectangleCollision HitBox => hb;
+
+        public DashParticle Initialize(Game game)
+        {
+            dashParticle = new DashParticle(game, 10);
+            return dashParticle;
+        }
         public void LoadContent(ContentManager content)
         {
             texture = content.Load<Texture2D>("squareMan");
@@ -79,11 +91,18 @@ namespace GameProject1
 
         private void Blink()
         {
-            if (blink) { position += new Vector2(150, 0); sfx.Play(.25f,0f, 0f); }
+            
+            if (blink) {
+                Vector2 dashPosition = new Vector2(position.X + 16, position.Y + 16);
+                position += new Vector2(150, 0);
+                dashParticle.placeDashParticle(dashPosition);
+                sfx.Play(.25f,0f, 0f);
+                Velocity = dashPosition;
+                Position = dashPosition;
+            }
             blink = false;
             color = Color.Red;
             timer = 30;
-            
         }
 
         private void CheckBounds(Viewport viewport)

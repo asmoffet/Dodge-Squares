@@ -77,7 +77,6 @@ namespace GameProject1
                 if(timer == 0)
                 {
                     timer = 21;
-                    p.score++;
                     phase++;
                 }
                 timer--;
