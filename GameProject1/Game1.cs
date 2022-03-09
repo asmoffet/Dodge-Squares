@@ -31,6 +31,7 @@ namespace GameProject1
         private int hghscr = 0;
         private float magnatude = 1f;
         private bool dead = false;
+        private bool dying = false;
 
 
         public Game1()
@@ -115,7 +116,7 @@ namespace GameProject1
                 }
             }
 
-            player.Update(gameTime, viewport);
+            player.Update(gameTime, viewport, dying);
             
             if(player.score > nxtsqr && square < painSquares.Length)
             {
@@ -263,11 +264,14 @@ namespace GameProject1
             // TODO: Add your drawing code here
             Viewport viewport = _graphics.GraphicsDevice.Viewport;
 
+            Matrix offset = Matrix.CreateTranslation(player.Position.X * .333f, player.Position.Y * .333f, 0);
+
             Matrix zoom = Matrix.CreateScale(magnatude);
             if (dead)
             {
                 magnatude = 2;
                 dead = false;
+                dying = true;
             }
             else if(magnatude > 1f)
             {
@@ -278,7 +282,12 @@ namespace GameProject1
                 }
 
             }
-            
+            else
+            {
+                dying = false;
+            }
+
+            Matrix pcLoc = Matrix.CreateTranslation(player.Position.X * .333f, player.Position.Y * .333f, 0);
 
             _spriteBatch.Begin(transformMatrix : zoom);
             if (!gameStarted)
@@ -297,6 +306,9 @@ namespace GameProject1
             foreach(var death in dl)death.Draw(gameTime, _spriteBatch);
             foreach (var goal in gs) goal.Draw(gameTime, _spriteBatch);
             _spriteBatch.End();
+
+            
+
             base.Draw(gameTime);
         }
     }

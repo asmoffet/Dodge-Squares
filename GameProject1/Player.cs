@@ -53,15 +53,15 @@ namespace GameProject1
             sfx = content.Load<SoundEffect>("Randomize6");
         }
 
-        public void Update(GameTime gameTime, Viewport viewport)
+        public void Update(GameTime gameTime, Viewport viewport, bool dead)
         {
             keyboardState = Keyboard.GetState();
-            if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W))) { position += new Vector2(0, -5); }
-            if (keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S)) { position += new Vector2(0, 5); }
-            if (keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A)) { position += new Vector2(-5, 0); }
-            if (keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D)) { position += new Vector2(5, 0); }
-            if (keyboardState.IsKeyDown(Keys.Space) && blink) { Blink(); }
-            if (keyboardState.IsKeyDown(Keys.H)) { helper = true; }
+            if ((keyboardState.IsKeyDown(Keys.Up) || keyboardState.IsKeyDown(Keys.W)) && !dead) { position += new Vector2(0, -5); }
+            if ((keyboardState.IsKeyDown(Keys.Down) || keyboardState.IsKeyDown(Keys.S)) && !dead) { position += new Vector2(0, 5); }
+            if ((keyboardState.IsKeyDown(Keys.Left) || keyboardState.IsKeyDown(Keys.A)) && !dead) { position += new Vector2(-5, 0); }
+            if ((keyboardState.IsKeyDown(Keys.Right) || keyboardState.IsKeyDown(Keys.D)) && !dead) { position += new Vector2(5, 0); }
+            if ((keyboardState.IsKeyDown(Keys.Space) && blink) && !dead) { Blink(); }
+            if ((keyboardState.IsKeyDown(Keys.H)) && !dead) { helper = true; }
             CheckBounds(viewport);
             hb.X = position.X;
             hb.Y = position.Y;
