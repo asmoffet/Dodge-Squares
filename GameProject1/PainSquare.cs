@@ -56,7 +56,7 @@ namespace GameProject1
 
         public void resetPain(Viewport viewport, bool mode)
         {
-            Vector2 rsPos = new Vector2(viewport.Width + rand.Next(0, 101), rand.Next(0, viewport.Height));
+            Vector2 rsPos = new Vector2(viewport.Width + rand.Next(125, 226), rand.Next(0, viewport.Height));
             scl = (float)rand.Next(1, 4);
             position = rsPos;
             hb.X = rsPos.X;

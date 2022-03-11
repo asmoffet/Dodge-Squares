@@ -30,6 +30,7 @@ namespace GameProject1
         private double nxtLzr = 30;
         private int hghscr = 0;
         private float magnatude = 1f;
+        private float offset = -50;
         private bool dead = false;
         private bool dying = false;
 
@@ -264,18 +265,27 @@ namespace GameProject1
             // TODO: Add your drawing code here
             Viewport viewport = _graphics.GraphicsDevice.Viewport;
 
-            Matrix offset = Matrix.CreateTranslation(player.Position.X * .333f, player.Position.Y * .333f, 0);
+            Matrix zoom;
 
-            Matrix zoom = Matrix.CreateScale(magnatude);
+            if (dying)
+            {
+                zoom = Matrix.CreateTranslation(new Vector3(offset, offset, 0)) * Matrix.CreateScale(magnatude);
+            }
+            else
+            {
+                zoom = Matrix.CreateScale(magnatude);
+            }
             if (dead)
             {
                 magnatude = 2;
+                offset = -50;
                 dead = false;
                 dying = true;
             }
             else if(magnatude > 1f)
             {
                 magnatude -= .05f;
+                offset -= 1.25f;
                 if (magnatude < 1f)
                 {
                     magnatude = 1f;

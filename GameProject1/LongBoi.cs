@@ -55,7 +55,7 @@ namespace GameProject1
 
         public void resetLong(Viewport viewport, bool mode)
         {
-            Vector2 rsPos = new Vector2(viewport.Width + rand.Next(100, 201), 0);
+            Vector2 rsPos = new Vector2(viewport.Width + rand.Next(225, 326), 0);
             position = rsPos;
             hb.X = rsPos.X;
             hb.Y = rsPos.Y;
